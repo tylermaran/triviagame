@@ -1,4 +1,3 @@
-
 var qBank = [
 	"What three countries share a border with North Korea?",
 	"What is the name for the branch of mathematics dealing with lengths and angles of triangles.",
@@ -25,7 +24,7 @@ var aBank = [
 	"Mr. Clean"
 ]
 
-var fBank1 =[
+var fBank1 = [
 	"China, Mongolia, South Korea",
 	"Geometry",
 	"John Adams",
@@ -38,112 +37,164 @@ var fBank1 =[
 	"Old Spice"
 ]
 
-console.log("WHAAAAT");
+var fBank2 = [
+	"Japan, China, South Korea",
+	"Algebra",
+	"John Kennedy",
+	"The Bible",
+	"Chicken Pox",
+	"World War II",
+	"Gettysburg",
+	"Alexander Fleming",
+	"South Africa",
+	"Tide"
+]
 
-$("document").ready(function startGame() {
+var interval = null;
+var number = 0;
 
+function startGame() {
+	number = 0;
+	$(".mainContent").empty();
 	var startGame = $("<div>");
 	var startMessage = $("<div>");
 	startMessage.addClass("startMessage");
-	startMessage.text("Ready to Play?");
+	startMessage.text("Ready to Play Trivia!?");
 
-	
 	var startButton = $("<div>");
-	startButton.attr("type","button");
+	startButton.attr("type", "button");
 	startButton.addClass("btn btn-primary");
 	startButton.text("Play!");
-	startButton.on("click", function() {
-		playGame(0)
+	startButton.on("click", function () {
+		playGame(0, true)
 	});
-	
 	startGame.append(startMessage, startButton);
-
 	$(".mainContent").append(startGame);
+};
 
-});
+function playGame(q, correct) {
+	var count = 10;
+	var timesup = true;
+	if (q === (qBank.length)) {
+		return newGame(number);
+	}
+	interval = setInterval(function () {
+		count--;
+		if (count === 0) {
+			clearInterval(interval);
 
-
-function playGame(q) {
-
-	var count=10;
-
-	var counter = setInterval(function() {
-	function timer() {
-  		count--;
-  		if (count <= 0)
-  			{
-     			clearInterval(counter);
-     			return checkAnswer("timeout", q);
-     			
-  			}
-			  //Do code for showing the number of seconds here
-			  // console.log(count);
-			  $(".timerDiv").text(count);
+			if (timesup) {
+				return checkAnswer("timeout", q);
+			} else {
+				var answer = $("#chosen").text()
+				return checkAnswer(answer, q)
+			}
+		} else {
+			var timeLeft = $("<div>");
+			timeLeft.addClass("timeLeft");
+			timeLeft.text(count);
+			$(".timerDiv").html(timeLeft);
 		}
-	}, 1000); 
+	}, 1000);
 
-	console.log("PLAAAAY");
 	$(".mainContent").empty();
 
 	var qdiv = $("<div>");
-	
+
 	var question = $("<div>");
 	question.addClass("question");
 	question.text(qBank[q]);
 
 	var answer1 = $("<div>");
-	answer1.attr("type","button");
+	answer1.attr("type", "button");
 	answer1.addClass("btn btn-primary");
 	answer1.text(aBank[q]);
-	answer1.on("click", function() {
-		checkAnswer(this.textContent, q);
+	answer1.on("click", function () {
+		answer2.attr("id", "");
+		answer3.attr("id", "");
+		answer1.attr("id", "chosen");
+		$(".resultsBar").text("You Sure?");
+		timesup = false;
 	});
 
 	var answer2 = $("<div>");
-	answer2.attr("type","button");
+	answer2.attr("type", "button");
 	answer2.addClass("btn btn-primary");
 	answer2.text(fBank1[q]);
-	answer2.on("click", function() {
-		checkAnswer(this.textContent, q);
+	answer2.on("click", function () {
+		answer1.attr("id", "");
+		answer3.attr("id", "");
+		answer2.attr("id", "chosen");
+		$(".resultsBar").text("You Sure?");
+		timesup = false;
+
+	});
+
+	var answer3 = $("<div>");
+	answer3.attr("type", "button");
+	answer3.addClass("btn btn-primary");
+	answer3.text(fBank2[q]);
+	answer3.on("click", function () {
+		answer1.attr("id", "");
+		answer2.attr("id", "");
+		answer3.attr("id", "chosen");
+		$(".resultsBar").text("You Sure?");
+		timesup = false;
 	});
 
 	var timerDiv = $("<div>");
 	timerDiv.addClass("timerDiv");
 
-	qdiv.append(question, answer1, answer2, timerDiv);
+	var resultsBar = $("<div>");
+	resultsBar.addClass("resultsBar");
+	resultsBar.text(" ");
+
+	qdiv.append(question, answer1, answer2, answer3, resultsBar, timerDiv);
 	$(".mainContent").append(qdiv);
 
+	if (q > 0) {
+		if (correct) {
+			number++;
+			$(".resultsBar").text("You got it!");
+			$(".resultsBar").attr("id", "correct");
+		} else {
 
-	function timer() {
-  		count--;
-  		if (count <= 0)
-  			{
-     			clearInterval(counter);
-     			return checkAnswer("timeout", q);
-     			
-  			}
-			  //Do code for showing the number of seconds here
-			  // console.log(count);
-			  $(".timerDiv").text(count);
+			$(".resultsBar").text("Nope!");
+			$(".resultsBar").attr("id", "incorrect");
 		}
-
+	}
 }
-
 
 function checkAnswer(answer, q) {
-	console.log(answer)
+
 	if (answer === aBank[q]) {
-		
-		console.log("correct");
-		playGame((q+1));
-	}
-	if (answer === "timeout") {
-		console.log("Time has expired");
-		playGame((q+1));
-	}
-	else {
-		
-		console.log("NOOOOPE");
-		playGame((q+1));
+		playGame((q + 1), true);
+	} else if (answer === "timeout") {
+		playGame((q + 1), false);
+	} else {
+		playGame((q + 1), false);
 	}
 }
+
+function newGame(number) {
+	$(".mainContent").empty();
+	var endDiv = $("<div>");
+	var message = $("<div>");
+	message.addClass("gameOver");
+	message.text("Game over. You got " + number + " correct");
+
+	var playAgain = $("<div>");
+	playAgain.attr("type", "button");
+	playAgain.addClass("btn btn-primary");
+	playAgain.text("Play Again?");
+	playAgain.on("click", function () {
+		startGame();
+	});
+	endDiv.append(message, playAgain);
+
+	$(".mainContent").append(endDiv);
+}
+
+$("document").ready(function () {
+	startGame();
+});
